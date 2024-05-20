@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horario</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    input[type="text"] {
+      width: 100%;
+    }
+    button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Crear Horario</h1>
+
+<table id="schedule">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Lunes</th>
+      <th>Martes</th>
+      <th>Miércoles</th>
+      <th>Jueves</th>
+      <th>Viernes</th>
+      <th>Sábado</th>
+      <th>Domingo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Generate rows for each hour from 8 am to 6 pm -->
+    <!-- Increment by 2 hours -->
+    <tr>
+      <td>8:00 AM - 10:00 AM</td>
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+    </tr>
+    <!-- Repeat for each 2-hour interval -->
+    <!-- For example, next row will be 10:00 AM - 12:00 PM -->
+    <!-- And so on until 6:00 PM -->
+  </tbody>
+</table>
+
+<button onclick="addRow()">Agregar Horas</button>
+<button onclick="addColumn()">Agregar Día</button>
+
+<script>
+  function addRow() {
+    const tbody = document.querySelector('#schedule tbody');
+    const lastRow = tbody.lastElementChild;
+    const lastRowHour = lastRow.querySelector('td').innerText.split(' - ')[1];
+    const newHour = incrementHour(lastRowHour);
+    const newRow = document.createElement('tr');
+    const daysCount = document.querySelector('#schedule thead tr').childElementCount - 1;
+
+    newRow.innerHTML = `<td>${newHour}</td>`;
+    for (let i = 0; i < daysCount; i++) {
+      newRow.innerHTML += '<td contenteditable="true"></td>';
+    }
+    tbody.appendChild(newRow);
+  }
+
+  function addColumn() {
+    const thead = document.querySelector('#schedule thead tr');
+    const newDay = prompt('Nombre del nuevo día:');
+    if (newDay) {
+      const newTh = document.createElement('th');
+      newTh.textContent = newDay;
+      thead.appendChild(newTh);
+
+      const tbody = document.querySelector('#schedule tbody');
+      const rows = tbody.querySelectorAll('tr');
+      rows.forEach(row => {
+        row.innerHTML += '<td contenteditable="true"></td>';
+      });
+    }
+  }
+
+  function incrementHour(hour) {
+    const [time, period] = hour.split(' ');
+    let [hourStr, minuteStr] = time.split(':');
+    let hourInt = parseInt(hourStr);
+    let minuteInt = parseInt(minuteStr);
+    if (period === 'PM' && hourInt !== 12) {
+      hourInt += 12;
+    }
+    minuteInt += 120; // Increment by 2 hours
+    if (minuteInt >= 60) {
+      hourInt += 1;
+      minuteInt -= 60;
+    }
+    let newPeriod = 'AM';
+    if (hourInt >= 12) {
+      newPeriod = 'PM';
+      if (hourInt > 12) {
+        hourInt -= 12;
+      }
+    }
+    return `${hourInt.toString().padStart(2, '0')}:${minuteInt.toString().padStart(2, '0')} ${newPeriod}`;
+  }
+</script>
+
+</body>
+</html>
